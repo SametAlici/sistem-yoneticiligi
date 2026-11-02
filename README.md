@@ -1,6 +1,6 @@
 # Sistem Yöneticiliği (BSM 441) Çalışma Rehberi
 
-Bütün haftaların özetleri, 5 vize denemesi (1–7. hafta) ve 3 final denemesi (bütün haftalar).
+Bütün haftaların özetleri, 5 vize denemesi (1–7. hafta) ve 5 final denemesi (bütün haftalar).
 
 Site: https://sametalici.github.io/sistem-yoneticiligi/
 
