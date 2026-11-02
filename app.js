@@ -41,6 +41,7 @@ function route() {
   else if (h.startsWith("deneme-")) renderTest(Number(h.split("-")[1]));
   else if (h === "denemeler") renderTestList();
   else if (h === "klasik") renderClassic();
+  else if (h.startsWith("klasik-")) renderClassicSet(Number(h.split("-")[1]));
   else renderHome();
   renderNav(h);
   window.scrollTo(0, 0);
@@ -63,6 +64,11 @@ function renderNav(current) {
   html += `<div class="nav-group">Final'e eklenenler</div>` + FINAL_WEEKS.map(weekBtn).join("");
   html += `<div class="nav-group">Klasik sorular</div>`;
   html += `<button data-go="klasik" class="${current === "klasik" ? "active" : ""}"><span class="num">✍️</span>Çıkmış klasik sorular</button>`;
+  CLASSIC_SETS.forEach((s, i) => {
+    const id = "klasik-" + (i + 1);
+    const nth = CLASSIC_SETS.slice(0, i + 1).filter(x => x.kind === s.kind).length;
+    html += `<button data-go="${id}" class="${current === id ? "active" : ""}"><span class="num">${s.kind === "vize" ? "KV" : "KF"}${nth}</span><span>${s.title}</span></button>`;
+  });
   html += `<div class="nav-group">Denemeler</div>`;
   html += `<button data-go="denemeler" class="${current === "denemeler" ? "active" : ""}"><span class="num">≡</span>Tüm denemeler</button>`;
   html += TESTS.map((t, i) => t.kind === "vize" ? testBtn(t, i) : "").join("");
@@ -90,8 +96,10 @@ function renderHome() {
     <div class="card"><b>İlerleme:</b> ${done.length} / ${WEEKS.length} hafta tamamlandı</div>
     <div class="box warn"><span class="label">✍️ Geçen yıl çıkan klasik sorular</span>
       Vize: <b>DHCP istemcisinin 4 aşaması ve tanımları</b> (Discover, Offer, Request, ACK).
-      Final: <b>Docker'ı oluşturan 5 parça ve tanımları</b> (Servis, İstemci, İmaj, Kaynak, Konteyner).
+      Final: <b>Docker'ı oluşturan 5 parça ve tanımları</b> (Servis, İstemci, İmaj, Kaynak, Konteyner) ve
+      <b>sunucu odasının güvenliği için alınacak önlemler</b>.
       Slayttaki tanımlarıyla ezberle: <a href="#klasik">Klasik sorular sayfası →</a>
+      · Olası diğer klasik sorular: <a href="#klasik-1">5 vize</a> ve <a href="#klasik-6">5 final klasik denemesi</a>.
     </div>
     <h2>Vize konuları (1–7. hafta)</h2>
     ${weekCards(VIZE_WEEKS, done)}
@@ -153,6 +161,8 @@ function renderClassic() {
     <div class="eyebrow">Klasik (yazılı) sorular</div>
     <h1>Çıkmış klasik sorular</h1>
     <p class="lead">Geçen yıl vizede ve finalde çıkan yazılı sorular. Önce her maddenin tanımını kendin söyle ya da kâğıda yaz, sonra "Tanımı göster" ile slayttaki cevapla karşılaştır.</p>
+    <div class="box tip"><span class="label">Sınav düzeni</span>Sınavlar test + klasik karışık. 30 puanlık klasik soruyu hoca sınavdan önceki hafta söylüyor; finalden önce sınıfta 2 uygulama var. Aşağıdakiler geçen yıl çıkanlar; olası diğer klasik sorular için klasik denemelere bak.</div>
+    <p>${CLASSIC_SETS.map((s, i) => `<button class="btn" data-go="klasik-${i + 1}" style="margin:0 6px 6px 0">${s.title}</button>`).join("")}</p>
     ${CLASSIC.map((c, ci) => `
       <div class="card">
         <div class="eyebrow">${c.exam === "vize" ? "Vize" : "Final"} · Hafta ${c.week}</div>
@@ -182,6 +192,60 @@ function renderClassic() {
       main.querySelectorAll(`[data-reveal^="${ci}-"]`).forEach(x => x.remove());
       b.remove();
     };
+  });
+}
+
+function renderClassicSet(n) {
+  const s = CLASSIC_SETS[n - 1];
+  if (!s) return renderClassic();
+  const total = s.questions.reduce((a, q) => a + q.p, 0);
+  const prev = CLASSIC_SETS[n - 2];
+  const next = CLASSIC_SETS[n];
+  main.innerHTML = `
+    <div class="eyebrow">Klasik deneme · ${s.kind === "vize" ? "Vize (1–7. hafta)" : "Final (bütün haftalar)"}</div>
+    <h1>${s.title}</h1>
+    <p class="lead">${s.questions.length} yazılı soru, toplam ${total} puan. Cevabını kâğıda yaz, sonra maddeleri tek tek aç ve kaç tanesini yazabildiğini işaretle.</p>
+    <div id="cq"></div>
+    <div class="pager">
+      ${prev ? `<button class="btn" data-go="klasik-${n - 1}">← ${prev.title}</button>` : `<button class="btn" data-go="klasik">← Çıkmış sorular</button>`}
+      ${next ? `<button class="btn primary" data-go="klasik-${n + 1}">${next.title} →</button>` : `<button class="btn" data-go="klasik">Çıkmış sorular</button>`}
+    </div>
+  `;
+  const box = document.getElementById("cq");
+  s.questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="eyebrow">Soru ${qi + 1} · ${q.p} puan · Hafta ${q.w}</div>
+      <p class="q-text" style="font-weight:600;font-size:1.05rem"></p>
+      <p><button class="btn" data-all>Bütün cevabı göster</button> <span class="pill quiz-meta" data-score></span></p>
+      <div data-items></div>`;
+    card.querySelector(".q-text").textContent = q.q;
+    const list = card.querySelector("[data-items]");
+    const known = new Set();
+    const score = card.querySelector("[data-score]");
+    const updateScore = () => { score.textContent = `Bildiğin madde: ${known.size} / ${q.items.length}`; };
+    q.items.forEach((it, ii) => {
+      const row = document.createElement("div");
+      row.className = "q";
+      row.innerHTML = `
+        <div class="q-head"><span class="q-text"><b></b></span></div>
+        <p><button class="btn" data-show>Cevabı göster</button></p>
+        <div class="explain" hidden><span data-def></span>
+          <p style="margin:.6em 0 0"><label><input type="checkbox" data-knew> Bunu yazabildim</label></p></div>`;
+      row.querySelector("b").textContent = it.name;
+      row.querySelector("[data-def]").textContent = it.def;
+      row.querySelector("[data-show]").onclick = e => { row.querySelector(".explain").hidden = false; e.target.remove(); };
+      row.querySelector("[data-knew]").onchange = e => { e.target.checked ? known.add(ii) : known.delete(ii); updateScore(); };
+      list.appendChild(row);
+    });
+    card.querySelector("[data-all]").onclick = e => {
+      card.querySelectorAll(".explain").forEach(x => { x.hidden = false; });
+      card.querySelectorAll("[data-show]").forEach(x => x.remove());
+      e.target.remove();
+    };
+    updateScore();
+    box.appendChild(card);
   });
 }
 

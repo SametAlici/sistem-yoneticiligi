@@ -651,5 +651,38 @@ const CLASSIC = [
       extra: "Konteyner; işletim sistemi, kullanıcının eklediği dosyalar ve metadatadan oluşur. Her konteyner bir imajdan meydana gelir." }
   ],
   summary: "Servis konteynerleri yönetir, istemci servise RESTful API ile komut verir, imaj taşınabilir şablondur, kaynak (registry) imajların deposudur, konteyner imajdan çalışan izole ortamdır."
+},
+{
+  exam: "final", week: 9,
+  title: "Sunucu (sistem) odasının güvenliği için alınacak önlemler",
+  question: "Bir sunucu odasının / veri merkezinin güvenliği için ne tür önlemler alınabilir? Açıklayınız. (Geçen yıl finalde bu tarzda sorulmuş.)",
+  hint: "Bulut Bilişim sunumundaki üç slayt: Sunucu odalarının yapılandırılması · Yangın güvenliği ve afet önlemleri · Fiziksel ortam koşulları. Sunucu güvenliği haftasındaki fiziksel faktörler de eklenebilir.",
+  items: [
+    { name: "Fiziksel güvenlik",
+      def: "Sunucu odaları erişim kontrollü olmalı; biyometrik sistemler, kartlı geçiş ve CCTV kameralarla izlenmelidir. Oda kilitli tutulmalıdır.",
+      extra: "" },
+    { name: "Güç yedekliliği",
+      def: "UPS sistemleri, jeneratörler ve çift enerji beslemeleri ile elektrik kesintilerine karşı önlem alınmalıdır.",
+      extra: "" },
+    { name: "İklimlendirme ve soğutma",
+      def: "Yüksek performanslı cihazların aşırı ısınmasını önlemek için hassas sıcaklık ve nem kontrolü gerekir. HVAC (ısıtma, havalandırma, iklimlendirme) sistemleri kesintisiz çalışmalı ve otomatik izlenmelidir.",
+      extra: "Sıcaklık genellikle 18–27 °C; nem %40–60 (düşükse statik elektrik, yüksekse yoğuşma riski)." },
+    { name: "Toz ve partikül filtreleme",
+      def: "Hassas elektronik ekipman için toz büyük tehdittir; filtre sistemleri ve temiz odalar kullanılmalıdır.",
+      extra: "" },
+    { name: "Raf sistemleri ve kablolama",
+      def: "Standartlaştırılmış rack yapıları ve düzenli kablolama hem havalandırma hem bakım kolaylığı sağlar.",
+      extra: "" },
+    { name: "Yangın algılama ve söndürme",
+      def: "Duman ve ısı dedektörleri erken uyarı sağlar ve otomatik alarm verir. Su yerine elektronik donanıma zarar vermeyen FM200 gazıyla söndürme yapılır.",
+      extra: "" },
+    { name: "Acil durum planları ve yedeklilik",
+      def: "Yangın, su baskını, deprem gibi durumlarda uygulanacak prosedürler önceden belirlenmelidir. Verilerin farklı lokasyonlarda yedeklenmesi (replikasyon) veri kaybını önler ve sürekliliği sağlar.",
+      extra: "3-2-1 kuralı: 3 kopya, 2 farklı ortam, 1 kopya farklı fiziksel lokasyonda." },
+    { name: "Diğer fiziksel faktörler",
+      def: "Su baskını, yüksek ısı ve statik elektriğe karşı önlem alınmalı; BIOS parola ile korunmalıdır (Sunucu güvenliği kontrol listesi).",
+      extra: "" }
+  ],
+  summary: "Sunucu odası erişim kontrollü (biyometrik, kartlı geçiş, CCTV) ve kilitli olmalı; UPS, jeneratör ve çift besleme ile güç yedeklenmeli; HVAC ile 18–27 °C sıcaklık ve %40–60 nem korunmalı, toz filtrelenmeli; standart raf ve düzenli kablolama kullanılmalı; duman/ısı dedektörü ve FM200 gazlı söndürme olmalı; afet planları hazırlanmalı ve veriler farklı lokasyonda yedeklenmelidir."
 }
 ];
