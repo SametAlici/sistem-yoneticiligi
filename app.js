@@ -40,6 +40,7 @@ function route() {
   if (h.startsWith("hafta-")) renderWeek(Number(h.split("-")[1]));
   else if (h.startsWith("deneme-")) renderTest(Number(h.split("-")[1]));
   else if (h === "denemeler") renderTestList();
+  else if (h === "klasik") renderClassic();
   else renderHome();
   renderNav(h);
   window.scrollTo(0, 0);
@@ -60,6 +61,8 @@ function renderNav(current) {
   let html = `<button data-go="home" class="${current === "home" ? "active" : ""}"><span class="num">⌂</span>Ana sayfa</button>`;
   html += `<div class="nav-group">Vize konuları (1–7)</div>` + VIZE_WEEKS.map(weekBtn).join("");
   html += `<div class="nav-group">Final'e eklenenler</div>` + FINAL_WEEKS.map(weekBtn).join("");
+  html += `<div class="nav-group">Klasik sorular</div>`;
+  html += `<button data-go="klasik" class="${current === "klasik" ? "active" : ""}"><span class="num">✍️</span>Çıkmış klasik sorular</button>`;
   html += `<div class="nav-group">Denemeler</div>`;
   html += `<button data-go="denemeler" class="${current === "denemeler" ? "active" : ""}"><span class="num">≡</span>Tüm denemeler</button>`;
   html += TESTS.map((t, i) => t.kind === "vize" ? testBtn(t, i) : "").join("");
@@ -85,6 +88,11 @@ function renderHome() {
     <h1>Sistem Yöneticiliği çalışma rehberi</h1>
     <p class="lead">Bütün haftaların özetleri, komutlar ve tablolar. İlk 7 hafta vize konusudur; ${vizeCount} vize denemesi yalnızca onlardan sorar. ${finalCount} final denemesi bütün haftaları kapsar. Her haftayı bitirince "Bu haftayı tamamladım" de; ilerlemen bu tarayıcıda saklanır.</p>
     <div class="card"><b>İlerleme:</b> ${done.length} / ${WEEKS.length} hafta tamamlandı</div>
+    <div class="box warn"><span class="label">✍️ Geçen yıl çıkan klasik sorular</span>
+      Vize: <b>DHCP istemcisinin 4 aşaması ve tanımları</b> (Discover, Offer, Request, ACK).
+      Final: <b>Docker'ı oluşturan 5 parça ve tanımları</b> (Servis, İstemci, İmaj, Kaynak, Konteyner).
+      Slayttaki tanımlarıyla ezberle: <a href="#klasik">Klasik sorular sayfası →</a>
+    </div>
     <h2>Vize konuları (1–7. hafta)</h2>
     ${weekCards(VIZE_WEEKS, done)}
     <h2>Final'e eklenen konular</h2>
@@ -106,6 +114,7 @@ function renderWeek(id) {
     <div class="eyebrow">Hafta ${w.id} · ${w.exam === "vize" ? "Vize konusu" : "Final konusu"}</div>
     <h1>${w.title}</h1>
     <div class="box key"><span class="label">🧩 Haftanın özü</span>${w.principle}</div>
+    ${CLASSIC.filter(c => c.week === w.id).map(c => `<div class="box warn"><span class="label">✍️ Çıkmış klasik soru (${c.exam})</span>${c.title}. Tanımları slayttaki hâliyle bil: <a href="#klasik">klasik sorular sayfasında çalış →</a></div>`).join("")}
     ${w.body}
     <button class="btn ${isDone ? "" : "primary"} mark-done" id="markDone">${isDone ? "✓ Tamamlandı (geri al)" : "Bu haftayı tamamladım"}</button>
     <div class="pager">
@@ -137,6 +146,43 @@ function renderTestList() {
     <h2>Final denemeleri (bütün haftalar)</h2>
     <div class="test-list">${rows("final")}</div>
   `;
+}
+
+function renderClassic() {
+  main.innerHTML = `
+    <div class="eyebrow">Klasik (yazılı) sorular</div>
+    <h1>Çıkmış klasik sorular</h1>
+    <p class="lead">Geçen yıl vizede ve finalde çıkan yazılı sorular. Önce her maddenin tanımını kendin söyle ya da kâğıda yaz, sonra "Tanımı göster" ile slayttaki cevapla karşılaştır.</p>
+    ${CLASSIC.map((c, ci) => `
+      <div class="card">
+        <div class="eyebrow">${c.exam === "vize" ? "Vize" : "Final"} · Hafta ${c.week}</div>
+        <h2 style="margin-top:.3em">${c.title}</h2>
+        <p><b>Soru:</b> ${c.question}</p>
+        <p class="quiz-meta">İpucu: ${c.hint}</p>
+        <p><button class="btn" data-toggle-all="${ci}">Bütün tanımları göster</button></p>
+        ${c.items.map((it, ii) => `
+          <div class="q">
+            <div class="q-head"><span class="q-text"><b>${it.name}</b></span></div>
+            <p><button class="btn" data-reveal="${ci}-${ii}">Tanımı göster</button></p>
+            <div class="explain" id="def-${ci}-${ii}" hidden>
+              <b>Slayttaki tanım:</b> ${it.def}
+              ${it.extra ? `<div style="margin-top:6px" class="quiz-meta">Ek bilgi: ${it.extra}</div>` : ""}
+            </div>
+          </div>`).join("")}
+        <div class="box key"><span class="label">Tek paragraflık özet cevap</span>${c.summary}</div>
+      </div>`).join("")}
+  `;
+  main.querySelectorAll("[data-reveal]").forEach(b => {
+    b.onclick = () => { document.getElementById("def-" + b.dataset.reveal).hidden = false; b.remove(); };
+  });
+  main.querySelectorAll("[data-toggle-all]").forEach(b => {
+    b.onclick = () => {
+      const ci = b.dataset.toggleAll;
+      main.querySelectorAll(`[id^="def-${ci}-"]`).forEach(d => { d.hidden = false; });
+      main.querySelectorAll(`[data-reveal^="${ci}-"]`).forEach(x => x.remove());
+      b.remove();
+    };
+  });
 }
 
 function renderTest(n) {

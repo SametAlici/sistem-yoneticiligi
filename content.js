@@ -604,3 +604,52 @@ docker stop                       → konteyneri durdur</div>
 `
 }
 ];
+
+// Geçmiş sınavlarda çıkan klasik (yazılı) sorular. Cevaplar slayttaki tanımlardır.
+const CLASSIC = [
+{
+  exam: "vize", week: 5,
+  title: "DHCP istemcisinin 4 aşaması ve tanımları",
+  question: "DHCP servisi, DHCP istemcisini 4 aşamada yapılandırır. Bu aşamaları sırasıyla yazıp her birini tanımlayınız.",
+  hint: "Kısaltma: DORA — Discover, Offer, Request, ACK.",
+  items: [
+    { name: "1. DHCP Discover (DHCP keşfi)",
+      def: "İstemci (client PC) broadcast yaparak ortamda DHCP sunucusu olup olmadığına bakar. Broadcast, herkese gönderilen paketlerdir; paketi alıp bu hizmete cevap verebilecek olan DHCP sunucusudur.",
+      extra: "İstemci mesajın içine kendi fiziksel (MAC) adresini ekler. Hedef IP 255.255.255.255, hedef MAC FF-FF-FF-FF-FF-FF, kaynak IP 0.0.0.0." },
+    { name: "2. DHCP Offer (IP kiralama teklifi)",
+      def: "Bu bir bilgi paketidir. DHCP hizmetini veren makine IP verebileceğini burada belirtir. DHCP sunucusu broadcast yaparak IP teklif eder.",
+      extra: "Sunucu, veritabanındaki ilk uygun IP adresini önerir. Mesaj broadcast gider ama içinde istemcinin MAC adresi olduğu için karışıklık olmaz." },
+    { name: "3. DHCP Request (Kiralanacak IP isteği)",
+      def: "İstemci broadcast yaparak teklif edilen IP'yi kabul ettiğini söyler.",
+      extra: "İstemci bu kez mesajın içine DHCP sunucusunun fiziksel (MAC) adresini ekler." },
+    { name: "4. DHCP ACK (IP kiralama onayı)",
+      def: "DHCP sunucusu broadcast yaparak IP'yi kullanması için izin verir.",
+      extra: "Sunucu isteği kabul ettiğini belirten ACK mesajını yayınlar ve istemci IP adresini edinmiş olur." }
+  ],
+  summary: "İstemci bilgisayar açıldığında ağa DHCPDiscover gönderir. Bunu alan DHCP sunucusu DHCPOffer ile IP sağlayabileceğini belirtir. İstemci DHCPRequest ile IP ister. DHCP sunucusu IP adresini verir ve DHCPAck gönderir."
+},
+{
+  exam: "final", week: 8,
+  title: "Docker'ı oluşturan 5 ana parça ve tanımları",
+  question: "Docker sistemi 5 ayrı parçadan oluşur. Bu parçaları yazıp her birini tanımlayınız.",
+  hint: "Servis · İstemci · İmaj · Kaynak · Konteyner.",
+  items: [
+    { name: "1. Docker Servisi",
+      def: "Docker servisi sadece konteynerlerin ayarlarını yapar ve çalışma zamanı verilerini toplar. Bir sanallaştırma yazılımı değildir ve RESTful API'ye sahiptir.",
+      extra: "" },
+    { name: "2. Docker İstemcisi",
+      def: "Aynı makinede ya da farklı bir makinede çalışan, Docker servisine RESTful API ile bağlanarak onu yöneten bileşendir.",
+      extra: "" },
+    { name: "3. Docker İmajı",
+      def: "Üzerine yazılımlarımızı yükleyebildiğimiz ve kendi istediğimiz şekilde oluşturabildiğimiz portatif sistem imajlarıdır.",
+      extra: "Her imaj katmanlardan oluşur; değişiklik yeni bir katman olarak eklenir (union filesystem)." },
+    { name: "4. Docker Kaynağı",
+      def: "Docker imajlarını depoladığınız, push ve pull işlemlerini yapabildiğiniz depodur.",
+      extra: "Docker Hub'ın herkese açık kaynakları kullanılabilir ya da kendi kaynağınızı oluşturabilirsiniz." },
+    { name: "5. Docker Konteyneri",
+      def: "Bir Docker imajı üzerinde koştuğunuz bir dizi komutun, sistemdeki diğer tüm servislerden izole çalıştığı sanal ortamdır. Sanal sunucu olarak düşünülebilir.",
+      extra: "Konteyner; işletim sistemi, kullanıcının eklediği dosyalar ve metadatadan oluşur. Her konteyner bir imajdan meydana gelir." }
+  ],
+  summary: "Servis konteynerleri yönetir, istemci servise RESTful API ile komut verir, imaj taşınabilir şablondur, kaynak (registry) imajların deposudur, konteyner imajdan çalışan izole ortamdır."
+}
+];
